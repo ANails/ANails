@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta tag esencial para el diseño responsive. Permite que la página se adapte al ancho del dispositivo. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Nails</title>
+    <!-- Incluye la librería de Tailwind CSS para el diseño. Las clases de Tailwind son las que hacen la página responsive. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Incluye la librería Chart.js para crear el gráfico de radar. -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Conexión a la fuente de Google Fonts para las tipografías 'Inter', 'Playfair Display' y 'Dancing Script'. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@400;700&family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
+    <!-- Icono de la pestaña del navegador (favicon). Se ha actualizado con un placeholder para garantizar que funcione. -->
+    <link rel="icon" type="image/x-icon" href="imagenes/icono/favicon.ico">
+    <style>
+        /* CSS personalizado para estilos que no se encuentran en Tailwind o para reglas específicas. */
+        /* 'Inter' es la fuente principal para el texto del cuerpo. */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: #4A4A4A;
+        }
+        /* 'Playfair Display' es la fuente para los títulos. */
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Contenedor del gráfico de radar para asegurar su tamaño y centrado. */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 450px;
+        }
+        /* Regla de estilo para dispositivos móviles para un tamaño más pequeño de gráfico. */
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+        /* Estilos para la pestaña activa en la sección del "Blueprint". */
+        .tab-active {
+            background-color: #FFC0CB;
+            color: #FFFFFF;
+        }
+        /* Estilos para las pestañas inactivas. */
+        .tab-inactive {
+            background-color: #F8E8E9;
+            color: #E27B8E;
+        }
+        /* Estilo para los ítems del carrusel, asegurando que ocupen el 100% del ancho y que estén ocultos por defecto. */
+        .carousel-item {
+            min-width: 100%; /* Cambiado de width a min-width para un mejor control del layout flexbox */
+            flex-shrink: 0;
+            display: none;
+        }
+        /* La clase 'active' muestra solo la imagen actual del carrusel. */
+        .carousel-item.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Sección del encabezado de la página -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo de la marca. Aquí puedes cambiar el texto o la fuente. -->
+            <div class="flex items-center space-x-2 text-2xl font-bold text-[#E27B8E]">
+                <span class="text-4xl font-['Dancing_Script'] font-bold">A Nails</span>
+            </div>
+            <!-- Menú de navegación para dispositivos de escritorio (oculto en móviles). -->
+            <div class="hidden md:flex space-x-8">
+                <!-- Enlaces a las diferentes secciones. Asegúrate de que el 'href' coincida con el 'id' de la sección. -->
+                <a href="#galeria" class="text-[#E27B8E] hover:text-[#FFC0CB] transition-colors duration-300">Galería de Trabajos</a>
+                <a href="#blueprint" class="text-[#E27B8E] hover:text-[#FFC0CB] transition-colors duration-300">Blueprint</a>
+                <a href="#oportunidad" class="text-[#E27B8E] hover:text-[#FFC0CB] transition-colors duration-300">Estrategia</a>
+            </div>
+            <!-- Botón del menú para dispositivos móviles (oculto en escritorio). -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-[#E27B8E] focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <!-- Menú de navegación desplegable para móviles. Por defecto está oculto. -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#galeria" class="block py-2 text-[#E27B8E] hover:text-[#FFC0CB]">Galería de Trabajos</a>
+            <a href="#blueprint" class="block py-2 text-[#E27B8E] hover:text-[#FFC0CB]">Blueprint</a>
+            <a href="#oportunidad" class="block py-2 text-[#E27B8E] hover:text-[#FFC0CB]">Estrategia</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Sección principal (Hero) de la página. Puedes cambiar el título y la descripción aquí. -->
+        <section id="hero" class="py-20 md:py-32 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <!-- El texto se hace más grande en pantallas medianas y grandes (md:text-6xl). -->
+                <h1 class="text-4xl md:text-6xl font-bold text-[#4A4A4A] mb-4">A Nails: Tu Salón de Uñas Personal</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                    Más que un salón, A Nails es la plataforma estratégica que muestra mis trabajos, comunica mi valor y facilita que clientes leales reserven sus citas. Este es mi blueprint interactivo.
+                </p>
+                <!-- Botón de llamada a la acción. Puedes cambiar el texto y el enlace. -->
+                <a href="#galeria" class="mt-8 inline-block bg-[#FFC0CB] text-white font-bold py-3 px-8 rounded-full hover:bg-[#E27B8E] transition-transform duration-300 transform hover:scale-105">Descubre mis trabajos</a>
+            </div>
+        </section>
+
+        <!-- Sección de la Galería de Trabajos (Carrusel de imágenes). -->
+        <section id="galeria" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#4A4A4A]">Mi Galería de Trabajos</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Mi portafolio es la mejor prueba de mi pasión y habilidad. Desliza para inspirarte con mis últimos diseños.</p>
+                </div>
+                <!-- Contenedor del carrusel. -->
+                <div class="relative max-w-5xl mx-auto overflow-hidden rounded-lg shadow-xl">
+                    <div id="carousel-container" class="flex transition-transform duration-500 ease-in-out">
+                        <!-- Las imágenes del carrusel se cargarán dinámicamente aquí -->
+                    </div>
+                    <!-- Botón para ir a la imagen anterior. -->
+                    <button id="prev-btn" class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/50 text-gray-800 p-2 rounded-full hover:bg-white transition-colors duration-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <!-- Botón para ir a la imagen siguiente. -->
+                    <button id="next-btn" class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/50 text-gray-800 p-2 rounded-full hover:bg-white transition-colors duration-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Sección del Blueprint con pestañas (tabs). -->
+        <section id="blueprint" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#4A4A4A]">Mi Blueprint para una Web de Éxito</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Construir una web que me ayude a crecer como profesional requiere una base sólida. Estos son los pilares de mi estrategia para generar confianza, comunicar valor y facilitar la reserva.</p>
+                </div>
+
+                <div class="max-w-4xl mx-auto">
+                    <!-- Contenedor de los botones de las pestañas. Utiliza flexbox para ser responsive. -->
+                    <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                        <!-- Botón de la pestaña de Diseño. 'data-tab' debe coincidir con el 'id' del panel de contenido. -->
+                        <button class="tab-button tab-active px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all duration-300 text-sm md:text-base" data-tab="design">Diseño y UX</button>
+                        <button class="tab-button tab-inactive px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all duration-300 text-sm md:text-base" data-tab="services">Mis Servicios</button>
+                        <button class="tab-button tab-inactive px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all duration-300 text-sm md:text-base" data-tab="features">Reservas Online</button>
+                    </div>
+
+                    <!-- Contenedor del contenido de las pestañas. -->
+                    <div id="tab-content" class="bg-white p-8 rounded-lg shadow-lg min-h-[400px]">
+                        <!-- Contenido de la pestaña de Diseño. Por defecto, es visible. -->
+                        <div class="tab-pane active" id="design-content">
+                            <h3 class="text-2xl font-bold text-[#E27B8E] mb-4">Diseño y Experiencia de Usuario</h3>
+                            <p class="mb-4">Mi web es el reflejo digital de la calidad de mi salón. Es visualmente atractiva, intuitiva y funciona perfectamente en cualquier dispositivo. El objetivo es guiarte hacia la reserva sin fricción.</p>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Diseño Responsivo:</strong> Adaptación perfecta a móviles, tablets y ordenadores.</li>
+                                <li><strong>Navegación Intuitiva:</strong> Menús claros y una estructura lógica que facilita encontrar información.</li>
+                                <li><strong>Estética Profesional:</strong> Uso de colores, tipografías y espacios que transmiten calidad y confianza.</li>
+                                <li><strong>Velocidad de Carga Rápida:</strong> Optimizamos para que las páginas carguen en menos de 3 segundos.</li>
+                            </ul>
+                        </div>
+                        <!-- Contenido de la pestaña de Servicios. Por defecto, está oculto. -->
+                        <div class="tab-pane hidden" id="services-content">
+                            <h3 class="text-2xl font-bold text-[#E27B8E] mb-4">Mis Servicios y Precios</h3>
+                            <p class="mb-6">Te presento mi menú de servicios, con descripciones claras y precios transparentes para que tomes la mejor decisión.</p>
+                            <!-- Este div se llenará dinámicamente con las tarjetas de servicios mediante JavaScript. -->
+                            <div id="service-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            </div>
+                        </div>
+                        <!-- Contenido de la pestaña de Reservas. Por defecto, está oculto. -->
+                        <div class="tab-pane hidden" id="features-content">
+                            <h3 class="text-2xl font-bold text-[#E27B8E] mb-4">Reservas Online</h3>
+                            <p class="mb-4">Para una experiencia más personal y directa, puedes reservar tu cita a través de mis perfiles de redes sociales.</p>
+                            <!-- Botones de reserva con iconos SVG. Cambia los enlaces 'href' por los de tus perfiles. -->
+                            <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 justify-center items-center">
+                                <a href="https://wa.me/34645534870" class="w-full md:w-auto flex-grow bg-[#25D366] text-white font-bold py-3 px-8 rounded-full flex items-center justify-center space-x-2 hover:bg-[#128C7E] transition-colors duration-300">
+                                    <!-- Icono de WhatsApp en formato SVG. -->
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12.04 2C7.26 2 3.32 5.94 3.32 10.72c0 1.98.66 3.86 1.8 5.38l-1.8 4.54 4.8-1.76c1.46.7 3.06 1.08 4.72 1.08 4.78 0 8.72-3.94 8.72-8.72C20.76 5.94 16.82 2 12.04 2zM17.15 15.69c-.27.27-.6.41-1 .41s-.73-.14-1-.41l-.8-.82c-.1-.1-.23-.15-.36-.15s-.26.05-.36.15l-.8.82c-.27.27-.6.41-1 .41s-.73-.14-1-.41l-.8-.82c-.1-.1-.23-.15-.36-.15s-.26.05-.36.15l-.8.82c-.27.27-.6.41-1 .41s-.73-.14-1-.41l-.8-.82c-.1-.1-.23-.15-.36-.15s-.26.05-.36.15l-1.6 1.63c-.15.15-.32.22-.5.22-.19 0-.36-.07-.5-.22l-.8-.82c-.27-.27-.6-.41-1-.41s-.73-.14-1-.41l-.8-.82c-.1-.1-.23-.15-.36-.15s-.26.05-.36.15l-1.6 1.63c-.15.15-.32.22-.5.22-.19 0-.36-.07-.5-.22l-.8-.82c-.1-.1-.23-.15-.36-.15s-.26.05-.36.15l-1.6 1.63c-.15.15-.32.22-.5.22-.19 0-.36-.07-.5-.22l-1.6-1.63c-.15-.15-.32-.22-.5.22-.19 0-.36-.07-.5-.22z"/>
+                                    </svg>
+                                    <span>Reservar por WhatsApp</span>
+                                </a>
+                                <a href="https://www.instagram.com/a.orteganails" class="w-full md:w-auto flex-grow bg-pink-500 text-white font-bold py-3 px-8 rounded-full flex items-center justify-center space-x-2 hover:bg-pink-600 transition-colors duration-300">
+                                    <!-- Icono de Instagram en formato SVG. -->
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2.16c3.2 0 3.59.01 4.85.07a5.55 5.55 0 0 1 3.9 1.48c.84.85 1.48 2 1.48 3.9a5.55 5.55 0 0 1 .07 4.85c-.06 1.26-.07 1.65-.07 4.85s.01 3.59.07 4.85a5.55 5.55 0 0 1-1.48 3.9c-.85.84-2 1.48-3.9 1.48a5.55 5.55 0 0 1-4.85.07c-1.26-.06-1.65-.07-4.85-.07s-3.59.01-4.85.07a5.55 5.55 0 0 1-3.9-1.48c-.84-.85-1.48-2-1.48-3.9a5.55 5.55 0 0 1-.07-4.85c.06-1.26.07-1.65.07-4.85s-.01-3.59-.07-4.85a5.55 5.55 0 0 1 1.48-3.9c.85-.84 2-1.48 3.9-1.48a5.55 5.55 0 0 1 4.85-.07zm0 1.65c-3.11 0-3.48.01-4.72.07-1.12.06-1.7.29-2.22.46-.5.17-.92.42-1.34.84a3.9 3.9 0 0 0-.84 1.34c-.17.52-.4 1.1-.46 2.22-.06 1.24-.07 1.61-.07 4.72s.01 3.48.07 4.72c.06 1.12.29 1.7.46 2.22.17.5.42.92.84 1.34a3.9 3.9 0 0 0 1.34.84c.52.17 1.1.4 2.22.46 1.24.06 1.61.07 4.72.07s3.48-.01 4.72-.07c1.12-.06 1.7-.29 2.22-.46.17-.5.42-.92.84-1.34a3.9 3.9 0 0 0 .84-1.34c.17-.52.4-1.1.46-2.22.06-1.24.07-1.61.07-4.72s-.01-3.48-.07-4.72c-.06-1.12-.29-1.7-.46-2.22-.17-.5-.42-.92-.84-1.34a3.9 3.9 0 0 0-1.34-.84c-.52-.17-1.1-.4-2.22-.46-1.24-.06-1.61-.07-4.72-.07zm-5.55 7.15c0 3.32 2.7 6.02 6.02 6.02s6.02-2.7 6.02-6.02-2.7-6.02-6.02-6.02-6.02 2.7-6.02 6.02zm1.65 0c0-2.43 1.98-4.41 4.41-4.41s4.41 1.98 4.41 4.41-1.98 4.41-4.41 4.41-4.41-1.98-4.41-4.41zm8.38-4.88a.98.98 0 0 1 1.96 0 .98.98 0 0 1-.98 1.05z"/>
+                                    </svg>
+                                    <span>Reservar por Instagram</span>
+                                </a>
+                            </div>
+                            <!-- Instrucciones para el usuario sobre cómo reservar. -->
+                            <p class="mt-6 text-sm text-gray-500 text-center max-w-2xl mx-auto">
+                                Para reservar, envíanos un mensaje con los siguientes detalles:
+                                <br>
+                                1. El servicio que deseas (ej. Manicura Semipermanente, Pedicura Spa).
+                                <br>
+                                2. Si tienes un diseño especial en mente, puedes adjuntar una foto de referencia.
+                                <br>
+                                3. Tu disponibilidad de días y horarios.
+                                <br>
+                                ¡Te responderemos lo antes posible para confirmar tu cita!
+                                <br>
+                                Horarios de L-V de 9-13, Sábados por la tarde a partir de las 16 y Domingos Total disponibilidad.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección del Análisis de Posicionamiento con el gráfico de radar. -->
+        <section id="oportunidad" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#4A4A4A]">Mi Posición en el Mercado</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Como profesional independiente, me diferencio de los modelos de negocio tradicionales, como las franquicias o los salones de lujo, ofreciendo una experiencia personalizada y transparente.</p>
+                </div>
+                <!-- Contenedor del gráfico. -->
+                <div class="chart-container">
+                    <canvas id="competitorChart"></canvas>
+                </div>
+                 <div class="mt-8 text-center text-sm text-gray-500">
+                    <p>Pasa el cursor sobre los puntos del gráfico para ver los detalles de cada arquetipo de competidor.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pie de página de la web. Puedes cambiar el texto de copyright. -->
+        <footer class="bg-white border-t border-gray-200">
+            <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+                <p>&copy; 2025 A Nails. Imagina y hazlo posible, solo visualizalo y lo realizamos.</p>
+                <p class="text-sm mt-2">Diseñado para transformar sueños en diseños.</p>
+            </div>
+        </footer>
+
+    <!-- Sección de JavaScript para la interactividad de la página. -->
+    <script>
+        // Espera a que el documento se cargue completamente antes de ejecutar el código.
+        document.addEventListener('DOMContentLoaded', function () {
+            // Manejo del menú de navegación móvil.
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileMenuButton.addEventListener('click', () => {
+                // Alterna la clase 'hidden' para mostrar u ocultar el menú.
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Efecto de scroll suave para los enlaces del menú.
+            const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
+            smoothScrollLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        // Desplaza la ventana suavemente hacia el elemento.
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                        // Cierra el menú móvil si estaba abierto.
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+
+            // Datos del gráfico de radar.
+            const competitorData = {
+                labels: ['Propuesta de Valor', 'Experiencia Cliente', 'Precio Percibido', 'Transparencia Online', 'Marca Personal'],
+                datasets: [
+                    {
+                        label: 'Franquicia (Nails Factory)',
+                        data: [3, 2, 3, 1, 1], // Valores del 1 al 5.
+                        backgroundColor: 'rgba(255, 192, 203, 0.2)', // Color del área.
+                        borderColor: 'rgba(255, 192, 203, 1)', // Color de la línea.
+                        pointBackgroundColor: 'rgba(255, 192, 203, 1)', // Color de los puntos.
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(255, 192, 203, 1)'
+                    },
+                    {
+                        label: 'Salón de Lujo (Siberia Salón)',
+                        data: [5, 5, 4, 5, 4],
+                        backgroundColor: 'rgba(226, 123, 142, 0.2)',
+                        borderColor: 'rgba(226, 123, 142, 1)',
+                        pointBackgroundColor: 'rgba(226, 123, 142, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(226, 123, 142, 1)'
+                    },
+                    {
+                        label: 'Salón Económico',
+                        data: [2, 2, 5, 2, 2],
+                        backgroundColor: 'rgba(131, 131, 131, 0.2)',
+                        borderColor: 'rgba(131, 131, 131, 1)',
+                        pointBackgroundColor: 'rgba(131, 131, 131, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(131, 131, 131, 1)'
+                    }
+                ]
+            };
+
+            // Configuración del gráfico de radar.
+            const config = {
+                type: 'radar',
+                data: competitorData,
+                options: {
+                    responsive: true, // El gráfico se adapta al tamaño del contenedor.
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {}
+                    },
+                    scales: {
+                        r: { // Ejes del gráfico.
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: { font: { size: 12 } },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                stepSize: 1, // Pasos del 1 al 5.
+                                max: 5,
+                                min: 0
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // Crea una nueva instancia del gráfico de radar.
+            const competitorChartCtx = document.getElementById('competitorChart');
+            if(competitorChartCtx) {
+                new Chart(competitorChartCtx, config);
+            }
+
+            // Lógica para el cambio de pestañas en la sección del Blueprint.
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+
+                    // Remueve la clase 'active' de todas las pestañas.
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('tab-active');
+                        btn.classList.add('tab-inactive');
+                    });
+                    // Añade la clase 'active' a la pestaña clicada.
+                    button.classList.add('tab-active');
+                    button.classList.remove('tab-inactive');
+
+                    // Muestra u oculta el contenido de las pestañas.
+                    tabPanes.forEach(pane => {
+                        if (pane.id === `${tabId}-content`) {
+                            pane.classList.remove('hidden');
+                            pane.classList.add('active');
+                        } else {
+                            pane.classList.add('hidden');
+                            pane.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            // Datos de los servicios. Aquí puedes añadir, editar o eliminar servicios.
+            const services = [
+                {
+                    name: 'Manicura Esmaltado Semipermanente Exprés',
+                    description: 'Esmaltado de larga duración con preparación básica de la uña. Solo entra cortar, limar y esmaltado.',
+                    price: ' 12€',
+                    duration: '45 min',
+                    image: 'imagenes/servicios/manicura_semi_expres.jpeg' // URL de la imagen del servicio.
+                },
+                {
+                    name: 'Manicura Completa',
+                    description: 'Incluye limpieza profunda de cutículas, limado de uñas, hidratación y un masaje relajante. El esmaltado se realiza con esmalte semipermanente',
+                    price: '18€',
+                    duration: '60 min aprox.',
+                    image: 'imagenes/servicios/manicura_completa.jpeg'
+                },
+                {
+                    name: 'Pedicura Exprés',
+                    description: 'Nuestra Pedicura Exprés es el servicio ideal para quienes buscan un cuidado rápido y efectivo para sus pies. Este tratamiento se enfoca en los pasos esenciales para lucir unas uñas impecables en poco tiempo.',
+                    price: '15€',
+                    duration: '40 min',
+                    image: 'imagenes/servicios/pedicura_expres.jpeg'
+                },
+                {
+                    name: 'Pedicura Spa (Completa)',
+                    description: 'Un tratamiento completo que incluye baño de burbujas, exfoliación, eliminación de durezas, crema hidratante, masaje y esmaltado de uñas.',
+                    price: '25€',
+                    duration: '80 min aprox.',
+                    image: 'imagenes/servicios/pedicura_spa.png'
+                },
+                {
+                    name: 'Reconstucción Uñas Mordidas',
+                    description: '¿Te muerdes las uñas y no logras que crezcan? Con nuestra técnica de reconstrucción transformamos tus uñas dañadas en unas manos elegantes y cuidadas. Trabajamos con productos de alta calidad para darles forma, alargarlas y protegerlas, logrando un resultado natural y duradero. ¡Despídete de la inseguridad y luce unas uñas impecables desde la primera sesión!',
+                    price: '40€',
+                    duration: '120 min aprox.',
+                    image: 'imagenes/servicios/Reco_Uñas.jpg'
+                },
+                {
+                    name: 'Acrygel/Soft Gel',
+                    description: 'Acrygel: Esta innovadora técnica es una fusión del acrílico y el gel. El resultado es una uña fuerte, ligera y flexible, ideal para quienes buscan una mayor resistencia sin el grosor del acrílico tradicional (Tallas M/L/XL PRCIOS DIFERENTES por tallaje) / Soft Gel: Usando puntas preformadas de gel, creamos extensiones de uñas con un aspecto natural y ultra brillante. Este método es perfecto para conseguir un largo y una forma perfecta de manera rápida y segura.',
+                    price: 'Acrygel S=35€ M=40€ L=45€ Xl=50€ / Soft Gel 25€',
+                    duration: '120/60 min parox.',
+                    image: 'imagenes/servicios/acrigel.jpeg'
+                },
+                {
+                    name: 'Suplemento Decoraciones',
+                    description: 'Ofrecemos diseños de uñas personalizados utilizando técnicas avanzadas y productos de alta calidad. Desde acabados modernos hasta la aplicación de detalles como piedras y efectos especiales, transformamos tus uñas en una extensión de tu estilo personal. (Antes de reservar enviad foto del diseño para saber con exactitud el tiempo y coste)',
+                    price: 'Desde 0,50€/deco',
+                    duration: '-',
+                    image: 'imagenes/servicios/decoraciones.jpeg'
+                },
+                {
+                    name: 'Suplemento Francesa',
+                    description: 'Ofrecemos un servicio de manicura francesa con un toque contemporáneo. Más allá del clásico blanco, puedes personalizar tu estilo eligiendo el color que prefieres para la punta. Logramos un acabado preciso y elegante que se adapta a tu gusto, manteniendo siempre la sofisticación atemporal de este diseño.',
+                    price: '+2€',
+                    duration: '55 min',
+                    image: 'imagenes/servicios/francesa.jpg'
+                }
+            ];
+
+            // Genera dinámicamente las tarjetas de servicios en la página.
+            const serviceListContainer = document.getElementById('service-list');
+            if(serviceListContainer) {
+                // Limpia el contenido antes de añadir los nuevos servicios.
+                serviceListContainer.innerHTML = ''; 
+                services.forEach(service => {
+                    const serviceCard = document.createElement('div');
+                    serviceCard.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300';
+                    serviceCard.innerHTML = `
+                        <img src="${service.image}" alt="${service.name}" class="rounded-lg mb-4 w-full h-40 object-cover">
+                        <h4 class="text-xl font-bold text-[#E27B8E] mb-2">${service.name}</h4>
+                        <p class="text-sm text-gray-600 mb-4">${service.description}</p>
+                        <div class="flex justify-between items-center text-gray-700">
+                            <span class="font-bold text-lg text-[#FFC0CB]">${service.price}</span>
+                            <span class="text-sm">${service.duration}</span>
+                        </div>
+                    `;
+                    serviceListContainer.appendChild(serviceCard);
+                });
+            }
+
+            // Lógica para el carrusel de imágenes.
+            const carouselContainer = document.getElementById('carousel-container');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            // Aquí puedes cambiar las URLs de las imágenes del carrusel.
+            const carouselImages = [
+                'imagenes/carrusel/carrusel1.jpg',
+                'imagenes/carrusel/carrusel2.jpg',
+                'imagenes/carrusel/carrusel3.jpg',
+                'imagenes/carrusel/carrusel4.jpg',
+                'imagenes/carrusel/carrusel5.jpg',
+                'imagenes/carrusel/carrusel6.jpg',
+                'imagenes/carrusel/carrusel7.jpg',
+                'imagenes/carrusel/carrusel8.jpg',
+                'imagenes/carrusel/carrusel9.jpg',
+                'imagenes/carrusel/carrusel10.jpg',
+                'imagenes/carrusel/carrusel11.jpg',
+                'imagenes/carrusel/carrusel12.jpg',
+                'imagenes/carrusel/carrusel13.jpg',
+                'imagenes/carrusel/carrusel14.jpg',
+                'imagenes/carrusel/carrusel15.jpg',
+                'imagenes/carrusel/carrusel16.jpg',
+                'imagenes/carrusel/carrusel17.jpg',
+                'imagenes/carrusel/carrusel18.jpg',
+                'imagenes/carrusel/carrusel19.jpg',
+                'imagenes/carrusel/carrusel20.jpg',
+                'imagenes/carrusel/carrusel21.jpg',
+                'imagenes/carrusel/carrusel22.jpg',
+            ];
+
+            // Crea dinámicamente los elementos <img> para el carrusel.
+            if (carouselContainer) {
+                carouselImages.forEach((imageSrc, index) => {
+                    const img = document.createElement('img');
+                    img.src = imageSrc;
+                    img.className = 'carousel-item';
+                    img.alt = `Nail Art by A Nails - Diseño ${index + 1}`;
+                    if (index === 0) {
+                        img.classList.add('active'); // Muestra la primera imagen.
+                    }
+                    carouselContainer.appendChild(img);
+                });
+            }
+
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            let currentIndex = 0;
+
+            function updateCarousel() {
+                // Remueve la clase 'active' de todas las imágenes.
+                carouselItems.forEach(item => {
+                    item.classList.remove('active');
+                });
+                // Añade la clase 'active' a la imagen actual para mostrarla.
+                carouselItems[currentIndex].classList.add('active');
+            }
+
+            // Escucha los clics en los botones de navegación del carrusel.
+            if (prevBtn && nextBtn && carouselItems.length > 0) {
+                nextBtn.addEventListener('click', () => {
+                    // Mueve al siguiente índice. Si es el último, regresa al principio.
+                    currentIndex = (currentIndex + 1) % carouselItems.length;
+                    updateCarousel();
+                });
+
+                prevBtn.addEventListener('click', () => {
+                    // Mueve al índice anterior. Si es el primero, va al último.
+                    currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+                    updateCarousel();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
